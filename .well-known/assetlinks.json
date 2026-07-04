@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.github.carajat.twa",
+        "sha256_cert_fingerprints": ["26:6F:46:F8:34:3E:C8:76:77:14:9C:8A:3E:57:A3:92:40:1C:CB:A3:79:57:8B:52:7B:63:1C:11:72:B3:8A:1C"]
+      }
+    }]

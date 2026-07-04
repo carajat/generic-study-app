@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="hi-IN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="description" content="CA Final Group 2 Study Companion — Track syllabus, schedule, mocks & daily planner for November 2026 exam">
+  <meta name="theme-color" content="#0a0b14" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f4f5f9" media="(prefers-color-scheme: light)">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>CA Final Tracker</title>
+  <link rel="manifest" href="manifest.json">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300,0,0" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=60">
+</head>
+<body>
+
+  <!-- ═══════════ TOAST NOTIFICATION ═══════════ -->
+  <div id="toast" class="toast"></div>
+
+  <!-- ═══════════ MODAL OVERLAY ═══════════ -->
+  <div id="modal-overlay" class="modal-overlay" onclick="closeModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 id="modal-title">Enter Score</h3>
+        <button class="modal-close" onclick="closeModal()"><span class="material-symbols-rounded">close</span></button>
+      </div>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════ MAIN APP CONTAINER ═══════════ -->
+  <div id="app">
+
+    <!-- ──────── TAB: DASHBOARD (HOME) ──────── -->
+    <section id="tab-dashboard" class="tab-content active">
+      <header class="app-header">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div style="text-align: left;">
+            <div style="position: relative; display: inline-block;">
+              <h1 id="group-title" style="margin:0;">CA Final Group 1</h1>
+              <select id="group-selector" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; appearance: none; font-size: 24px;" onchange="switchGroup(this.value)">
+                <option value="group1">CA Final Group 1</option>
+                <option value="group2">CA Final Group 2</option>
+              </select>
+            </div>
+            <p class="subtitle" style="margin: 4px 0 0 0;">November 2026 · New Scheme</p>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="theme-btn" id="themeToggleBtn" onclick="toggleTheme()" style="position: relative; z-index: 10;">
+              <span class="material-symbols-rounded">light_mode</span>
+            </button>
+            <button class="theme-btn" onclick="openMenuModal()" style="position: relative; z-index: 10;">
+              <span class="material-symbols-rounded">menu</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Countdown -->
+      <div class="countdown-card glass-card">
+        <div class="countdown-label"><span class="material-symbols-rounded" style="font-size:18px; vertical-align:middle; margin-right:4px;">hourglass_empty</span> EXAM COUNTDOWN</div>
+        <div class="countdown-numbers">
+          <div class="countdown-unit">
+            <span id="cd-days" class="cd-value">---</span>
+            <span class="cd-label">DAYS</span>
+          </div>
+          <div class="countdown-unit">
+            <span id="cd-hours" class="cd-value">--</span>
+            <span class="cd-label">HRS</span>
+          </div>
+          <div class="countdown-unit">
+            <span id="cd-mins" class="cd-value">--</span>
+            <span class="cd-label">MIN</span>
+          </div>
+          <div class="countdown-unit">
+            <span id="cd-secs" class="cd-value">--</span>
+            <span class="cd-label">SEC</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card glass-card" onclick="switchTab('syllabus')">
+          <div class="stat-icon"><span class="material-symbols-rounded">book</span></div>
+          <div class="stat-value" id="dash-syllabus-pct">0%</div>
+          <div class="stat-label">Syllabus Done</div>
+          <div class="stat-bar"><div class="stat-bar-fill" id="dash-syllabus-bar"></div></div>
+        </div>
+        <div class="stat-card glass-card" onclick="switchTab('exams')">
+          <div class="stat-icon"><span class="material-symbols-rounded">edit_document</span></div>
+          <div class="stat-value" id="dash-next-mock">--</div>
+          <div class="stat-label" id="dash-next-mock-label">Next Mock</div>
+        </div>
+      </div>
+
+      <!-- Current Activity -->
+      <div class="current-activity glass-card" onclick="switchTab('schedule')">
+        <div class="ca-header"><span class="material-symbols-rounded icon-sm">schedule</span> Current Activity</div>
+        <div id="current-slot-info">
+          <div class="ca-slot-name" id="ca-slot-name">Loading...</div>
+          <div class="ca-slot-details" id="ca-slot-details"></div>
+        </div>
+        <div class="ca-next" id="ca-next-slot"></div>
+      </div>
+
+      <!-- Today's Planner Summary -->
+      <div class="planner-summary glass-card" onclick="switchTab('planner')">
+        <div class="ps-header"><span class="material-symbols-rounded icon-sm">calendar_today</span> Today's Plan</div>
+        <div class="ps-stats">
+          <span id="dash-planner-done">0</span>/<span id="dash-planner-total">0</span> tasks done
+        </div>
+        <div class="stat-bar"><div class="stat-bar-fill" id="dash-planner-bar"></div></div>
+      </div>
+
+      <!-- Quote -->
+      <div class="quote-card glass-card">
+        <div class="quote-icon"><span class="material-symbols-rounded">format_quote</span></div>
+        <p id="daily-quote" class="quote-text"></p>
+      </div>
+    </section>
+
+    <!-- ──────── TAB: EXAM SCHEDULE ──────── -->
+    <section id="tab-exams" class="tab-content">
+      <header class="tab-header">
+        <h2><span class="material-symbols-rounded" style="vertical-align:bottom; margin-right:8px; font-size: 28px;">event</span> Exam Schedule</h2>
+      </header>
+
+      <!-- Finals Countdown Mini -->
+      <div class="mini-countdown glass-card">
+        <span class="mc-label"><span class="material-symbols-rounded" style="vertical-align:bottom; margin-right:4px; font-size: 20px;">school</span> CA Final</span>
+        <span class="mc-days" id="exam-days-left">-- days</span>
+      </div>
+
+      <!-- Next Mock Highlight -->
+      <div class="next-mock-card glass-card" id="next-mock-card">
+        <div class="nmc-label"><span class="material-symbols-rounded" style="vertical-align:bottom; margin-right:4px; font-size: 18px;">local_fire_department</span> NEXT MOCK TEST</div>
+        <div class="nmc-subject" id="nmc-subject">--</div>
+        <div class="nmc-date" id="nmc-date">--</div>
+        <div class="nmc-countdown" id="nmc-countdown">--</div>
+      </div>
+
+      <!-- Mock Series -->
+      <div id="mock-series-container"></div>
+
+      <!-- Score Trend Chart -->
+      <div class="glass-card chart-card">
+        <h3><span class="material-symbols-rounded icon-sm">trending_up</span> Score Trend</h3>
+        <canvas id="score-chart" width="400" height="200"></canvas>
+      </div>
+    </section>
+
+    <!-- ──────── TAB: TIMETABLE ──────── -->
+    <section id="tab-schedule" class="tab-content">
+      <header class="tab-header">
+        <h2><span class="material-symbols-rounded" style="vertical-align:bottom; margin-right:8px; font-size: 28px;">schedule</span> Daily Timetable</h2>
+      </header>
+
+      <!-- Schedule Toggle -->
+      <div class="schedule-toggle glass-card">
+        <button id="btn-early" class="toggle-btn active" onclick="switchSchedule('earlyMorning')"><span class="material-symbols-rounded" style="vertical-align:middle; margin-right:4px; font-size: 18px;">wb_twilight</span> Early Morning</button>
+        <button id="btn-late" class="toggle-btn" onclick="switchSchedule('lateNight')"><span class="material-symbols-rounded" style="vertical-align:middle; margin-right:4px; font-size: 18px;">dark_mode</span> Late Night</button>
+      </div>
+
+      <!-- Schedule Slots -->
+      <div id="schedule-slots-container"></div>
+
+      <!-- Study Rules -->
+      <div class="rules-card glass-card">
+        <h3><span class="material-symbols-rounded" style="vertical-align:bottom; margin-right:4px; font-size: 20px;">rule</span> Daily Rules</h3>
+        <ul id="study-rules-list"></ul>
+      </div>
+    </section>
+
+    <!-- ──────── TAB: CALENDAR PLANNER ──────── -->
+    <section id="tab-planner" class="tab-content">
+      <header class="tab-header">
+        <h2><span class="material-symbols-rounded" style="vertical-align:bottom; margin-right:8px; font-size: 28px;">calendar_month</span> Study Planner</h2>
+      </header>
+
+      <!-- Next Mock Reminder -->
+      <div class="planner-mock-reminder glass-card" id="planner-mock-reminder"></div>
+
+      <!-- Mini Calendar -->
+      <div class="mini-calendar glass-card">
+        <div class="cal-nav">
+          <button onclick="changeMonth(-1)"><span class="material-symbols-rounded" style="font-size: 24px;">chevron_left</span></button>
+          <span id="cal-month-label">July 2026</span>
+          <button onclick="changeMonth(1)"><span class="material-symbols-rounded" style="font-size: 24px;">chevron_right</span></button>
+        </div>
+        <div class="cal-weekdays">
+          <span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span>
+        </div>
+        <div id="cal-days" class="cal-days"></div>
+        <div class="cal-legend">
+          <span><span class="dot dot-green"></span>All done</span>
+          <span><span class="dot dot-yellow"></span>Partial</span>
+          <span><span class="dot dot-orange"></span>Mock Test</span>
+          <span><span class="dot dot-red"></span>Exam</span>
+        </div>
+      </div>
+
+      <!-- Day Navigation -->
+      <div class="day-nav glass-card">
+        <button onclick="changePlannerDay(-1)">◀</button>
+        <span id="planner-day-label">Today</span>
+        <button onclick="changePlannerDay(1)">▶</button>
+      </div>
+
+      <!-- Planner Tasks -->
+      <div id="planner-tasks-container">
+        <div class="planner-section">
+          <h3><span class="material-symbols-rounded icon-sm">menu_book</span> Primary Subject</h3>
+          <div id="planner-primary-tasks"></div>
+        </div>
+        <div class="planner-section">
+          <h3><span class="material-symbols-rounded icon-sm">import_contacts</span> Secondary Subject</h3>
+          <div id="planner-secondary-tasks"></div>
+        </div>
+        <div class="planner-section">
+          <h3><span class="material-symbols-rounded icon-sm">task_alt</span> Quick Tasks</h3>
+          <div id="planner-quick-tasks"></div>
+        </div>
+      </div>
+
+      <!-- Add Task Button -->
+      <div class="planner-actions">
+        <button class="btn-primary" onclick="openAddTaskModal()">+ Add Task</button>
+        <button class="btn-secondary" onclick="copyToTomorrow()"><span class="material-symbols-rounded icon-sm">content_copy</span> Copy to Tomorrow</button>
+      </div>
+    </section>
+
+    <!-- ──────── TAB: SYLLABUS ──────── -->
+    <section id="tab-syllabus" class="tab-content">
+      <header class="tab-header">
+        <h2><span class="material-symbols-rounded" style="vertical-align:bottom; margin-right:8px; font-size: 28px;">menu_book</span> Syllabus Tracker</h2>
+      </header>
+
+      <!-- Overall Progress -->
+      <div class="overall-progress glass-card">
+        <div class="op-label">Overall Progress</div>
+        <div class="op-value" id="overall-pct">0%</div>
+        <div class="stat-bar stat-bar-lg"><div class="stat-bar-fill" id="overall-bar"></div></div>
+      </div>
+
+      <!-- Subject Selector -->
+      <div id="syllabus-subjects-list"></div>
+
+      <!-- Chapter Detail View (hidden initially) -->
+      <div id="syllabus-detail" class="syllabus-detail" style="display:none;">
+        <button class="back-btn" onclick="showSubjectsList()"><span class="material-symbols-rounded" style="vertical-align:middle; margin-right:4px;">arrow_back</span> Back</button>
+        <div id="syllabus-detail-header"></div>
+        <div id="syllabus-detail-content"></div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ═══════════ BOTTOM NAVIGATION ═══════════ -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-tab="dashboard" onclick="switchTab('dashboard')">
+      <span class="material-symbols-rounded nav-icon">home</span>
+      <span class="nav-label">Home</span>
+    </button>
+    <button class="nav-item" data-tab="exams" onclick="switchTab('exams')">
+      <span class="material-symbols-rounded nav-icon">edit_document</span>
+      <span class="nav-label">Exams</span>
+    </button>
+    <button class="nav-item" data-tab="schedule" onclick="switchTab('schedule')">
+      <span class="material-symbols-rounded nav-icon">schedule</span>
+      <span class="nav-label">Timetable</span>
+    </button>
+    <button class="nav-item" data-tab="planner" onclick="switchTab('planner')">
+      <span class="material-symbols-rounded nav-icon">calendar_month</span>
+      <span class="nav-label">Planner</span>
+    </button>
+    <button class="nav-item" data-tab="syllabus" onclick="switchTab('syllabus')">
+      <span class="material-symbols-rounded nav-icon">menu_book</span>
+      <span class="nav-label">Syllabus</span>
+    </button>
+  </nav>
+
+  <!-- Scripts -->
+  <!-- ═══════════ HIDDEN INPUTS & PRINT ═══════════ -->
+  <input type="file" id="import-file" style="display:none" accept=".json" onchange="handleImportFile(event)">
+  
+  <div id="print-section"></div>
+
+  <script src="Sortable.min.js"></script>
+  <script src="data.js?v=60"></script>
+  <script src="app.js?v=60"></script>
+</body>
+</html>
